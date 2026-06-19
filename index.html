@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consumer Phone Update Portal</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --navy: #0f172a; --navy2: #1e293b; --teal: #0891b2; --teal-light: #06b6d4;
+    --teal-pale: #ecfeff; --amber: #f59e0b; --green: #16a34a; --green-pale: #dcfce7;
+    --red: #dc2626; --red-pale: #fee2e2; --gray: #64748b; --light: #f8fafc;
+    --border: #e2e8f0; --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--navy); min-height: 100vh; }
+  .nav { background: var(--navy); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .nav-brand { color: var(--white); font-size: 16px; font-weight: 700; }
+  .nav-brand span { color: var(--teal-light); }
+  .nav-tabs { display: flex; gap: 4px; }
+  .nav-tab { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; background: transparent; color: #94a3b8; }
+  .nav-tab:hover { background: #1e293b; color: var(--white); }
+  .nav-tab.active { background: var(--teal); color: var(--white); }
+  .view { display: none; padding: 32px 24px; max-width: 960px; margin: 0 auto; }
+  .view.active { display: block; }
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
+  .field input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border 0.15s; }
+  .field input:focus { border-color: var(--teal); }
+  .field input.error { border-color: var(--red); }
+  .field input.success { border-color: var(--green); }
+  .field-hint { font-size: 12px; margin-top: 5px; }
+  .field-hint.error { color: var(--red); }
+  .field-hint.success { color: var(--green); }
+  .btn { padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .btn-primary { background: var(--teal); color: var(--white); }
+  .btn-primary:hover { background: #0e7490; }
+  .btn-success { background: var(--green); color: var(--white); }
+  .btn-success:hover { background: #15803d; }
+  .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--navy); }
+  .btn-danger { background: var(--red); color: var(--white); }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .search-bar { display: flex; gap: 10px; }
+  .search-bar input { flex: 1; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; outline: none; }
+  .search-bar input:focus { border-color: var(--teal); }
+  .consumer-card { background: var(--teal-pale); border: 1.5px solid var(--teal-light); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+  .consumer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; margin-bottom: 16px; }
+  .cf-label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .cf-value { font-size: 14px; font-weight: 600; color: var(--navy); }
+  .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; margin-bottom: 16px; display: none; }
+  .alert.success { background: var(--green-pale); color: var(--green); border: 1px solid #86efac; }
+  .alert.error { background: var(--red-pale); color: var(--red); border: 1px solid #fca5a5; }
+  .alert.info { background: #eff6ff; color: #1d4ed8; border: 1px solid #93c5fd; }
+  .upload-box { border: 2px dashed var(--border); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.15s; }
+  .upload-box:hover { border-color: var(--teal); background: var(--teal-pale); }
+  .upload-box input { display: none; }
+  .upload-box .ub-icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-box p { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .upload-box small { font-size: 12px; color: var(--gray); }
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: var(--navy); color: var(--white); padding: 10px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--light); }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 24px; }
+  .stat { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+  .stat-label { font-size: 12px; color: var(--gray); margin-bottom: 4px; }
+  .stat-value { font-size: 26px; font-weight: 700; }
+  .stat-value.teal { color: var(--teal); }
+  .stat-value.green { color: var(--green); }
+  .stat-value.amber { color: var(--amber); }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .badge-green { background: var(--green-pale); color: var(--green); }
+  .badge-red { background: var(--red-pale); color: var(--red); }
+  .steps { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
+  .step { display: flex; align-items: center; gap: 8px; }
+  .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; background: var(--border); color: var(--gray); }
+  .step-num.active { background: var(--teal); color: var(--white); }
+  .step-num.done { background: var(--green); color: var(--white); }
+  .step-label { font-size: 13px; color: var(--gray); font-weight: 500; }
+  .step-label.active { color: var(--navy); font-weight: 700; }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; }
+  .page-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+  .page-sub { font-size: 14px; color: var(--gray); margin-bottom: 28px; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  #dl-link { display: none; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">⚡ <span>MVVNL</span> Consumer Portal</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('user', event)">Consumer</button>
+    <button class="nav-tab" onclick="showView('admin', event)">Admin</button>
+  </div>
+</nav>
+
+<!-- USER VIEW -->
+<div class="view active" id="view-user">
+  <div class="page-title">Update Mobile Number</div>
+  <p class="page-sub">Search by consumer number or meter number to request a mobile update.</p>
+  <div class="steps">
+    <div class="step"><div class="step-num active" id="s1">1</div><div class="step-label active" id="sl1">Search</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num" id="s2">2</div><div class="step-label" id="sl2">Verify</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-num" id="s3">3</div><div class="step-label" id="sl3">Submit</div></div>
+  </div>
+
+  <div id="step1">
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Search Consumer</div>
+      <div class="search-bar">
+        <input type="text" id="search-input" placeholder="Enter Consumer Number or Meter Number..." onkeydown="if(event.key==='Enter')searchConsumer()">
+        <button class="btn btn-primary" id="search-btn" onclick="searchConsumer()">Search</button>
+      </div>
+      <div class="alert" id="search-alert"></div>
+    </div>
+  </div>
+
+  <div id="step2" style="display:none;">
+    <div class="consumer-card">
+      <div class="card-title" style="margin-bottom:12px;"><span class="dot"></span>Consumer Details</div>
+      <div class="consumer-grid">
+        <div><div class="cf-label">Consumer No.</div><div class="cf-value" id="d-consumer"></div></div>
+        <div><div class="cf-label">Name</div><div class="cf-value" id="d-name"></div></div>
+        <div><div class="cf-label">Meter No.</div><div class="cf-value" id="d-meter"></div></div>
+        <div><div class="cf-label">Current Phone</div><div class="cf-value" id="d-phone"></div></div>
+        <div><div class="cf-label">Status</div><div class="cf-value" id="d-status"></div></div>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="resetSearch()">← Search Again</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Enter New Mobile Number</div>
+      <div class="field">
+        <label>New Mobile Number</label>
+        <input type="text" id="new-phone" maxlength="10" placeholder="Enter 10-digit mobile number" oninput="validatePhone(this.value)" onkeydown="if(event.key==='Enter')submitRequest()">
+        <div class="field-hint" id="phone-hint"></div>
+      </div>
+      <div class="alert" id="submit-alert"></div>
+      <button class="btn btn-success" id="submit-btn" onclick="submitRequest()" disabled>Submit Request</button>
+    </div>
+  </div>
+
+  <div id="step3" style="display:none;">
+    <div class="card" style="text-align:center; padding:40px;">
+      <div style="font-size:48px; margin-bottom:16px;">✅</div>
+      <div style="font-size:20px; font-weight:800; margin-bottom:8px; color:var(--green);">Request Submitted!</div>
+      <p style="font-size:14px; color:var(--gray); margin-bottom:24px;">Your mobile update request has been saved successfully.</p>
+      <div style="background:var(--light); border-radius:10px; padding:16px; display:inline-block; text-align:left; margin-bottom:24px; min-width:280px;">
+        <div style="font-size:12px; color:var(--gray); margin-bottom:4px;">Account Number</div>
+        <div style="font-size:15px; font-weight:700;" id="conf-account"></div>
+        <hr style="margin:12px 0;">
+        <div style="font-size:12px; color:var(--gray); margin-bottom:4px;">New Mobile Number</div>
+        <div style="font-size:15px; font-weight:700; color:var(--teal);" id="conf-phone"></div>
+      </div>
+      <br>
+      <button class="btn btn-primary" onclick="newRequest()">Submit Another Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN VIEW -->
+<div class="view" id="view-admin">
+  <div class="page-title">Admin Dashboard</div>
+  <p class="page-sub">Manage master data, download change requests, and process updates.</p>
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-label">Total Consumers</div><div class="stat-value teal" id="a-total">—</div></div>
+    <div class="stat"><div class="stat-label">Pending Requests</div><div class="stat-value amber" id="a-pending">—</div></div>
+    <div class="stat"><div class="stat-label">Processed</div><div class="stat-value green" id="a-processed">—</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>1. Upload Master CSV</div>
+    <div class="upload-box" onclick="document.getElementById('master-input').click()">
+      <div class="ub-icon">📂</div>
+      <p>Click to upload Master CSV</p>
+      <small>Replaces all existing master data in database</small>
+      <input type="file" id="master-input" accept=".csv" onchange="uploadMaster(this.files[0])">
+    </div>
+    <div class="alert" id="master-alert"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>2. Pending Change Requests</div>
+    <div id="no-requests" style="font-size:14px; color:var(--gray); padding:12px 0;">Loading...</div>
+    <div id="requests-table-wrap" style="display:none;">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Account No.</th><th>Name</th><th>Current Phone</th><th>New Phone</th><th>Requested At</th></tr></thead>
+          <tbody id="requests-tbody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="downloadRequests()">⬇ Download CSV</button>
+        <button class="btn btn-danger btn-sm" onclick="clearRequests()">🗑 Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>3. Upload Processed File</div>
+    <p style="font-size:13px; color:var(--gray); margin-bottom:16px;">Upload the processed CSV — matching accounts will be marked done and removed from pending.</p>
+    <div class="upload-box" onclick="document.getElementById('processed-input').click()">
+      <div class="ub-icon">✅</div>
+      <p>Click to upload Processed CSV</p>
+      <small>Must have columns: account_no, new_phone</small>
+      <input type="file" id="processed-input" accept=".csv" onchange="uploadProcessed(this.files[0])">
+    </div>
+    <div class="alert" id="processed-alert"></div>
+  </div>
+</div>
+
+<a id="dl-link"></a>
+
+<script>
+// ─── SUPABASE INIT ────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://dxjbhhgqgshucgfbnmyu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4amJoaGdxZ3NodWNnZmJubXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4ODc2MTUsImV4cCI6MjA5NzQ2MzYxNX0.OjBxeuOofZbN-hEWmMdtord8VjvwxpvYcmVZi1ZmZJo';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let currentConsumer = null;
+
+// ─── VIEWS ────────────────────────────────────────────────────────────────────
+async function showView(v, event) {
+  if (v === 'admin') {
+    const pwd = prompt('Enter Admin Password:');
+    if (pwd !== 'Sudhanshu2020@') { alert('❌ Incorrect password.'); return; }
+    await refreshAdmin();
+  }
+  document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  if (event) event.target.classList.add('active');
+}
+
+// ─── UPLOAD MASTER CSV ────────────────────────────────────────────────────────
+async function uploadMaster(file) {
+  if (!file) return;
+  showAlert('master-alert', '⏳ Uploading master data...', 'info');
+  const text = await file.text();
+  const lines = text.trim().split(/\r?\n/);
+  const delim = lines[0].includes('\t') ? '\t' : ',';
+  const headers = splitLine(lines[0], delim).map(h => h.trim().toLowerCase().replace(/ /g,'_'));
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = splitLine(lines[i], delim);
+    const row = {};
+    headers.forEach((h, idx) => row[h] = (vals[idx] || '').trim());
+    rows.push(row);
+  }
+
+  // Delete existing master data
+  await db.from('master_data').delete().neq('id', 0);
+
+  // Insert in batches of 500
+  const batchSize = 500;
+  let inserted = 0;
+  for (let i = 0; i < rows.length; i += batchSize) {
+    const batch = rows.slice(i, i + batchSize);
+    const { error } = await db.from('master_data').insert(batch);
+    if (error) { showAlert('master-alert', '❌ Error: ' + error.message, 'error'); return; }
+    inserted += batch.length;
+  }
+  showAlert('master-alert', `✅ ${inserted} consumer records uploaded successfully!`, 'success');
+  await refreshAdmin();
+}
+
+// ─── SEARCH ───────────────────────────────────────────────────────────────────
+async function searchConsumer() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) { showAlert('search-alert', 'Please enter a consumer number or meter number.', 'error'); return; }
+
+  const btn = document.getElementById('search-btn');
+  btn.innerHTML = '<span class="spinner"></span>Searching...';
+  btn.disabled = true;
+
+  const { data, error } = await db.from('master_data')
+    .select('*')
+    .or(`consumer_no.ilike.%${q}%,meter_no.ilike.%${q}%`)
+    .limit(1);
+
+  btn.innerHTML = 'Search';
+  btn.disabled = false;
+
+  if (error) { showAlert('search-alert', 'Search error: ' + error.message, 'error'); return; }
+  if (!data || data.length === 0) { showAlert('search-alert', '❌ No consumer found. Please check the number and try again.', 'error'); return; }
+
+  currentConsumer = data[0];
+  hideAlert('search-alert');
+
+  const name = ((currentConsumer.first_name || '') + ' ' + (currentConsumer.last_name || '')).trim() || 'N/A';
+  document.getElementById('d-consumer').textContent = currentConsumer.consumer_no || 'N/A';
+  document.getElementById('d-name').textContent     = name;
+  document.getElementById('d-meter').textContent    = currentConsumer.meter_no || 'N/A';
+  document.getElementById('d-phone').textContent    = currentConsumer.phone || 'N/A';
+  document.getElementById('d-status').innerHTML     = `<span class="badge ${currentConsumer.status === 'Active' ? 'badge-green' : 'badge-red'}">${currentConsumer.status || 'N/A'}</span>`;
+
+  setStep(2);
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  document.getElementById('new-phone').value = '';
+  document.getElementById('phone-hint').textContent = '';
+  document.getElementById('submit-btn').disabled = true;
+}
+
+// ─── PHONE VALIDATION ─────────────────────────────────────────────────────────
+function validatePhone(val) {
+  const input = document.getElementById('new-phone');
+  const hint  = document.getElementById('phone-hint');
+  const btn   = document.getElementById('submit-btn');
+  val = val.trim();
+  if (val === '') { input.className=''; hint.textContent=''; hint.className='field-hint'; btn.disabled=true; return; }
+  if (!/^\d+$/.test(val)) { setPhoneError(input,hint,btn,'❌ Only digits allowed — no spaces, dashes or letters.'); }
+  else if (val[0]==='0') { setPhoneError(input,hint,btn,'❌ Mobile numbers cannot start with 0.'); }
+  else if (!['6','7','8','9'].includes(val[0])) { setPhoneError(input,hint,btn,'❌ Indian mobile numbers must start with 6, 7, 8 or 9.'); }
+  else if (val.length < 10) { setPhoneError(input,hint,btn,`❌ Too short — ${val.length}/10 digits entered.`); }
+  else if (val.length > 10) { setPhoneError(input,hint,btn,'❌ Too long — must be exactly 10 digits.'); }
+  else { input.className='success'; hint.className='field-hint success'; hint.textContent='✅ Valid mobile number.'; btn.disabled=false; }
+}
+
+function setPhoneError(input,hint,btn,msg) {
+  input.className='error'; hint.className='field-hint error'; hint.textContent=msg; btn.disabled=true;
+}
+
+// ─── SUBMIT REQUEST ───────────────────────────────────────────────────────────
+async function submitRequest() {
+  const newPhone = document.getElementById('new-phone').value.trim();
+  if (!currentConsumer || !newPhone || document.getElementById('submit-btn').disabled) return;
+
+  const btn = document.getElementById('submit-btn');
+  btn.innerHTML = '<span class="spinner"></span>Submitting...';
+  btn.disabled = true;
+
+  const name = ((currentConsumer.first_name||'') + ' ' + (currentConsumer.last_name||'')).trim();
+  const accountNo = currentConsumer.consumer_no || '';
+
+  // Check if request already exists — update it
+  const { data: existing } = await db.from('change_requests').select('id').eq('account_no', accountNo).eq('status','pending').limit(1);
+
+  let error;
+  if (existing && existing.length > 0) {
+    ({ error } = await db.from('change_requests').update({ new_phone: newPhone, requested_at: new Date().toISOString() }).eq('id', existing[0].id));
+  } else {
+    ({ error } = await db.from('change_requests').insert({
+      account_no: accountNo,
+      consumer_name: name,
+      current_phone: currentConsumer.phone || '',
+      new_phone: newPhone,
+      status: 'pending'
+    }));
+  }
+
+  btn.innerHTML = 'Submit Request';
+  btn.disabled = false;
+
+  if (error) { showAlert('submit-alert', '❌ Error: ' + error.message, 'error'); return; }
+
+  document.getElementById('conf-account').textContent = accountNo;
+  document.getElementById('conf-phone').textContent   = newPhone;
+  setStep(3);
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = 'block';
+}
+
+function newRequest() {
+  resetSearch();
+  document.getElementById('step3').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  document.getElementById('search-input').value = '';
+  setStep(1);
+}
+
+function resetSearch() {
+  currentConsumer = null;
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  document.getElementById('search-input').value = '';
+  hideAlert('search-alert');
+  setStep(1);
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+async function refreshAdmin() {
+  // Total consumers
+  const { count: total } = await db.from('master_data').select('*', { count: 'exact', head: true });
+  document.getElementById('a-total').textContent = (total || 0).toLocaleString();
+
+  // Pending requests
+  const { data: pending, count: pendingCount } = await db.from('change_requests').select('*', { count: 'exact' }).eq('status','pending').order('requested_at', { ascending: false });
+  document.getElementById('a-pending').textContent = pendingCount || 0;
+
+  // Processed count
+  const { count: processed } = await db.from('change_requests').select('*', { count: 'exact', head: true }).eq('status','processed');
+  document.getElementById('a-processed').textContent = (processed || 0).toLocaleString();
+
+  // Render table
+  if (!pending || pending.length === 0) {
+    document.getElementById('no-requests').style.display = 'block';
+    document.getElementById('no-requests').textContent = 'No pending requests.';
+    document.getElementById('requests-table-wrap').style.display = 'none';
+  } else {
+    document.getElementById('no-requests').style.display = 'none';
+    document.getElementById('requests-table-wrap').style.display = 'block';
+    document.getElementById('requests-tbody').innerHTML = pending.map((r,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td><strong>${r.account_no}</strong></td>
+        <td>${r.consumer_name}</td>
+        <td>${r.current_phone}</td>
+        <td style="color:var(--teal);font-weight:600;">${r.new_phone}</td>
+        <td style="color:var(--gray);font-size:12px;">${new Date(r.requested_at).toLocaleString()}</td>
+      </tr>`).join('');
+  }
+}
+
+async function downloadRequests() {
+  const { data } = await db.from('change_requests').select('account_no,new_phone').eq('status','pending');
+  if (!data || !data.length) return;
+  const csv = ['account_no,new_phone', ...data.map(r => `${r.account_no},${r.new_phone}`)].join('\n');
+  triggerDownload(csv, 'phone_change_requests.csv');
+}
+
+async function clearRequests() {
+  if (!confirm('Clear all pending requests? This cannot be undone.')) return;
+  await db.from('change_requests').delete().eq('status','pending');
+  await refreshAdmin();
+}
+
+async function uploadProcessed(file) {
+  if (!file) return;
+  showAlert('processed-alert', '⏳ Processing...', 'info');
+  const text = await file.text();
+  const lines = text.trim().split(/\r?\n/);
+  const delim = lines[0].includes('\t') ? '\t' : ',';
+  const headers = splitLine(lines[0], delim).map(h => h.trim().toLowerCase());
+  const accounts = [];
+  for (let i = 1; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = splitLine(lines[i], delim);
+    const row = {};
+    headers.forEach((h, idx) => row[h] = (vals[idx]||'').trim());
+    const acc = row['account_no'] || row['account_number'] || row['consumer_no'] || '';
+    if (acc) accounts.push(acc);
+  }
+  let updated = 0;
+  for (const acc of accounts) {
+    const { error } = await db.from('change_requests').update({ status: 'processed' }).eq('account_no', acc).eq('status','pending');
+    if (!error) updated++;
+  }
+  showAlert('processed-alert', `✅ ${updated} accounts marked as processed.`, 'success');
+  await refreshAdmin();
+}
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('s'+i).className  = 'step-num' + (i<n?' done':i===n?' active':'');
+    document.getElementById('sl'+i).className = 'step-label' + (i===n?' active':'');
+  });
+}
+function showAlert(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent=msg; el.className='alert '+type; el.style.display='block';
+}
+function hideAlert(id) { document.getElementById(id).style.display='none'; }
+function triggerDownload(content, filename) {
+  const blob = new Blob(['\uFEFF'+content], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.getElementById('dl-link');
+  a.href=url; a.download=filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 3000);
+}
+function splitLine(line, delim) {
+  const result=[]; let cur=''; let inQ=false;
+  for (let i=0; i<line.length; i++) {
+    const c=line[i];
+    if (c==='"'){inQ=!inQ;}
+    else if (c===delim&&!inQ){result.push(cur);cur='';}
+    else{cur+=c;}
+  }
+  result.push(cur);
+  return result;
+}
+</script>
+</body>
+</html>
