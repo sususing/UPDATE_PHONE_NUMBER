@@ -250,13 +250,44 @@ async function uploadMaster(file) {
   const text = await file.text();
   const lines = text.trim().split(/\r?\n/);
   const delim = lines[0].includes('\t') ? '\t' : ',';
-  const headers = splitLine(lines[0], delim).map(h => h.trim().toLowerCase().replace(/ /g,'_'));
+  const rawHeaders = splitLine(lines[0], delim).map(h => h.trim().toLowerCase().replace(/ /g,'_').replace(/[^a-z0-9_]/g,''));
+
+  // Map any CSV column variation → exact Supabase column name
+  const colMap = {
+    'consumer_no':'consumer_no','consumerid':'consumer_no','consumer_id':'consumer_no',
+    'status':'status',
+    'acc_type':'acc_type','account_type':'acc_type',
+    'first_name':'first_name','firstname':'first_name',
+    'last_name':'last_name','lastname':'last_name',
+    'phone':'phone','mobile':'phone','phone_no':'phone','mobile_no':'phone',
+    'meter_no':'meter_no','meterno':'meter_no','meter_number':'meter_no',
+    'meter_type':'meter_type','metertype':'meter_type',
+    'uom':'uom',
+    'sanction_load':'sanction_load','sanctionload':'sanction_load','sanction_l':'sanction_load',
+    'customer_meter_phase':'customer_meter_phase','customer_meter_pha':'customer_meter_phase',
+    'meter_bill_type':'meter_bill_type','meter_bill':'meter_bill_type','meter_billt':'meter_bill_type',
+    'meter_status':'meter_status','meterstatus':'meter_status','meter_sta':'meter_status',
+    'lat':'lat','latitude':'lat',
+    'lng':'lng','longitude':'lng',
+    'app_status':'app_status','appstatus':'app_status','app_statuses':'app_status','app_statu':'app_status',
+    'sanction_load2':'sanction_load','sanction_l2':'sanction_load',
+    'is_tod':'is_tod','istod':'is_tod',
+    'svc_addr_line1':'svc_addr_line1','svcaddrline1':'svc_addr_line1','svc_addr':'svc_addr_line1','address':'svc_addr_line1'
+  };
+
+  const headers = rawHeaders.map(h => colMap[h] || h);
+
+  // Only keep columns that exist in our table
+  const validCols = new Set(['consumer_no','status','acc_type','first_name','last_name','phone','meter_no','meter_type','uom','sanction_load','customer_meter_phase','meter_bill_type','meter_status','lat','lng','app_status','is_tod','svc_addr_line1']);
+
   const rows = [];
   for (let i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
     const vals = splitLine(lines[i], delim);
     const row = {};
-    headers.forEach((h, idx) => row[h] = (vals[idx] || '').trim());
+    headers.forEach((h, idx) => {
+      if (validCols.has(h)) row[h] = (vals[idx] || '').trim();
+    });
     rows.push(row);
   }
 
@@ -495,3 +526,4 @@ function splitLine(line, delim) {
 </script>
 </body>
 </html>
+
