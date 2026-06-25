@@ -57,12 +57,14 @@
   .cf-label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
   .cf-value { font-size: 14px; font-weight: 600; color: var(--navy); }
   /* Phone number cards */
-  .phone-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 16px; }
+  .phone-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; margin-bottom: 16px; }
   .phone-card { border-radius: 10px; padding: 14px 16px; border: 1.5px solid; }
+  .phone-card.current { background: #fff7ed; border-color: #fdba74; }
   .phone-card.rms { background: #eff6ff; border-color: #93c5fd; }
   .phone-card.otp { background: var(--green-pale); border-color: #86efac; }
   .phone-card.ticket { background: var(--purple-pale); border-color: #c4b5fd; }
   .phone-card .pc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .phone-card.current .pc-label { color: #c2410c; }
   .phone-card.rms .pc-label { color: #1d4ed8; }
   .phone-card.otp .pc-label { color: var(--green); }
   .phone-card.ticket .pc-label { color: var(--purple); }
@@ -169,6 +171,10 @@
       <!-- Phone Numbers Display -->
       <div class="section-label">Registered Phone Numbers</div>
       <div class="phone-cards">
+        <div class="phone-card current">
+          <div class="pc-label">📱 Current Number</div>
+          <div class="pc-num" id="d-current">—</div>
+        </div>
         <div class="phone-card rms">
           <div class="pc-label">📋 RMS Number</div>
           <div class="pc-num" id="d-rms">—</div>
@@ -188,7 +194,20 @@
     <div class="card">
       <div class="card-title"><span class="dot"></span>Submit Change Request</div>
 
-      <div class="info-box">⚠️ Please fill your name and select which number type you are updating. All changes are logged with your name and timestamp.</div>
+      <div class="info-box">⚠️ The new number will replace the <strong>Current Number</strong> on record. Enter your name and the new number to proceed. All changes are logged with your name and timestamp.</div>
+
+      <div style="background:var(--light); border-radius:8px; padding:12px 16px; margin-bottom:16px; display:flex; align-items:center; gap:12px;">
+        <div style="font-size:22px;">📱</div>
+        <div>
+          <div style="font-size:11px; color:var(--gray); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Current Number (will be replaced)</div>
+          <div style="font-size:18px; font-weight:800; color:#c2410c;" id="form-current-num">—</div>
+        </div>
+        <div style="margin-left:auto; font-size:22px;">→</div>
+        <div>
+          <div style="font-size:11px; color:var(--gray); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">New Number</div>
+          <div style="font-size:18px; font-weight:800; color:var(--teal);" id="form-new-preview">—</div>
+        </div>
+      </div>
 
       <div class="field-row">
         <div class="field">
@@ -197,7 +216,7 @@
           <div class="field-hint" id="operator-hint"></div>
         </div>
         <div class="field">
-          <label>Number Type to Update <span style="color:var(--red)">*</span></label>
+          <label>Number Type <span style="color:var(--red)">*</span></label>
           <select id="number-type" onchange="onNumberTypeChange()">
             <option value="">— Select type —</option>
             <option value="rms">RMS Number</option>
@@ -227,6 +246,7 @@
       <div style="background:var(--light); border-radius:10px; padding:16px; display:inline-block; text-align:left; margin-bottom:24px; min-width:300px;">
         <div style="display:grid; gap:10px;">
           <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Account Number</div><div style="font-size:15px;font-weight:700;" id="conf-account"></div></div>
+          <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Old Number</div><div style="font-size:15px;font-weight:700;color:#c2410c;text-decoration:line-through;" id="conf-old-phone"></div></div>
           <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">New Mobile Number</div><div style="font-size:15px;font-weight:700;color:var(--teal);" id="conf-phone"></div></div>
           <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Number Type</div><div style="font-size:14px;font-weight:600;" id="conf-type"></div></div>
           <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Changed By</div><div style="font-size:14px;font-weight:600;" id="conf-operator"></div></div>
@@ -448,9 +468,14 @@ async function searchConsumer() {
   document.getElementById('d-status').innerHTML     = `<span class="badge ${currentConsumer.status === 'Active' ? 'badge-green' : 'badge-red'}">${currentConsumer.status || 'N/A'}</span>`;
 
   // Show phone numbers
+  setPhoneCard('d-current', currentConsumer.phone);
   setPhoneCard('d-rms',    currentConsumer.rms_number);
   setPhoneCard('d-otp',    currentConsumer.otp_verified_number);
   setPhoneCard('d-ticket', currentConsumer.ticket_number);
+
+  // Set current number in form preview
+  document.getElementById('form-current-num').textContent = currentConsumer.phone || 'Not set';
+  document.getElementById('form-new-preview').textContent = '—';
 
   setStep(2);
   document.getElementById('step1').style.display = 'none';
@@ -462,6 +487,7 @@ async function searchConsumer() {
   document.getElementById('new-phone').value = '';
   document.getElementById('phone-hint').textContent = '';
   document.getElementById('new-phone').className = '';
+  document.getElementById('form-new-preview').textContent = '—';
   document.getElementById('submit-btn').disabled = true;
   phoneValid = false;
 }
@@ -485,15 +511,19 @@ function validatePhone(val) {
   const hint  = document.getElementById('phone-hint');
   val = val.trim();
   phoneValid = false;
-  if (val === '') { input.className=''; hint.textContent=''; hint.className='field-hint'; }
-  else if (!/^\d+$/.test(val)) { setPhoneError(input, hint, '❌ Only digits allowed.'); }
-  else if (!['6','7','8','9'].includes(val[0])) { setPhoneError(input, hint, '❌ Must start with 6, 7, 8 or 9.'); }
-  else if (val.length < 10) { setPhoneError(input, hint, `❌ Too short — ${val.length}/10 digits.`); }
-  else if (val.length > 10) { setPhoneError(input, hint, '❌ Too long — must be exactly 10 digits.'); }
+  if (val === '') {
+    input.className=''; hint.textContent=''; hint.className='field-hint';
+    document.getElementById('form-new-preview').textContent = '—';
+  }
+  else if (!/^\d+$/.test(val)) { setPhoneError(input, hint, '❌ Only digits allowed.'); document.getElementById('form-new-preview').textContent = '—'; }
+  else if (!['6','7','8','9'].includes(val[0])) { setPhoneError(input, hint, '❌ Must start with 6, 7, 8 or 9.'); document.getElementById('form-new-preview').textContent = '—'; }
+  else if (val.length < 10) { setPhoneError(input, hint, `❌ Too short — ${val.length}/10 digits.`); document.getElementById('form-new-preview').textContent = val; }
+  else if (val.length > 10) { setPhoneError(input, hint, '❌ Too long — must be exactly 10 digits.'); document.getElementById('form-new-preview').textContent = '—'; }
   else {
     input.className = 'success';
     hint.className = 'field-hint success';
     hint.textContent = '✅ Valid mobile number.';
+    document.getElementById('form-new-preview').textContent = val;
     phoneValid = true;
   }
   checkFormReady();
@@ -532,12 +562,8 @@ async function submitRequest() {
   const name      = ((currentConsumer.first_name||'') + ' ' + (currentConsumer.last_name||'')).trim();
   const accountNo = currentConsumer.consumer_no || '';
 
-  // Determine old number based on type
-  const oldNumber = {
-    rms: currentConsumer.rms_number,
-    otp_verified: currentConsumer.otp_verified_number,
-    ticket: currentConsumer.ticket_number
-  }[numberType] || currentConsumer.phone || '';
+  // Always use current phone as old number
+  const oldNumber = currentConsumer.phone || '';
 
   const now = new Date().toISOString();
 
@@ -575,6 +601,7 @@ async function submitRequest() {
 
   // Show confirmation
   document.getElementById('conf-account').textContent  = accountNo;
+  document.getElementById('conf-old-phone').textContent = oldNumber;
   document.getElementById('conf-phone').textContent    = newPhone;
   document.getElementById('conf-type').textContent     = TYPE_LABELS[numberType] || numberType;
   document.getElementById('conf-operator').textContent = operatorName;
@@ -752,5 +779,3 @@ function splitLine(line, delim) {
 
 </body>
 </html>
-
-
