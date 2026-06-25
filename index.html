@@ -166,6 +166,8 @@
         <div><div class="cf-label">Name</div><div class="cf-value" id="d-name"></div></div>
         <div><div class="cf-label">Meter No.</div><div class="cf-value" id="d-meter"></div></div>
         <div><div class="cf-label">Status</div><div class="cf-value" id="d-status"></div></div>
+        <div><div class="cf-label">Meter Type</div><div class="cf-value" id="d-meter-type"></div></div>
+        <div style="grid-column:span 2;"><div class="cf-label">Address</div><div class="cf-value" id="d-address" style="white-space:normal;font-size:13px;"></div></div>
       </div>
 
       <!-- Phone Numbers Display -->
@@ -456,6 +458,19 @@ async function searchConsumer() {
   document.getElementById('d-name').textContent     = name;
   document.getElementById('d-meter').textContent    = currentConsumer.meter_no || 'N/A';
   document.getElementById('d-status').innerHTML     = `<span class="badge ${currentConsumer.status === 'Active' ? 'badge-green' : 'badge-red'}">${currentConsumer.status || 'N/A'}</span>`;
+
+  // Meter type: E = Normal Meter, S = Solar Meter
+  const mt = (currentConsumer.meter_type || '').trim().toUpperCase();
+  const mtLabel = mt === 'E' ? '⚡ Normal Meter' : mt === 'S' ? '☀️ Solar Meter' : (mt || 'N/A');
+  const mtColor = mt === 'E' ? 'badge-blue' : mt === 'S' ? 'badge-amber' : '';
+  document.getElementById('d-meter-type').innerHTML = mtColor
+    ? `<span class="badge ${mtColor}">${mtLabel}</span>`
+    : mtLabel;
+
+  // Address
+  const addr = [currentConsumer.svc_addr_line1, currentConsumer.address2, currentConsumer.address3]
+    .filter(Boolean).join(', ') || currentConsumer.svc_addr_line1 || 'N/A';
+  document.getElementById('d-address').textContent = addr;
 
   // Show phone numbers
   setPhoneCard('d-current', currentConsumer.phone);
