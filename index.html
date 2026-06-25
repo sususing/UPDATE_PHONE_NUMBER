@@ -10,7 +10,7 @@
     --navy: #0f172a; --navy2: #1e293b; --teal: #0891b2; --teal-light: #06b6d4;
     --teal-pale: #ecfeff; --amber: #f59e0b; --green: #16a34a; --green-pale: #dcfce7;
     --red: #dc2626; --red-pale: #fee2e2; --gray: #64748b; --light: #f8fafc;
-    --border: #e2e8f0; --white: #ffffff;
+    --border: #e2e8f0; --white: #ffffff; --purple: #7c3aed; --purple-pale: #ede9fe;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--light); color: var(--navy); min-height: 100vh; }
@@ -21,20 +21,22 @@
   .nav-tab { padding: 8px 18px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; background: transparent; color: #94a3b8; }
   .nav-tab:hover { background: #1e293b; color: var(--white); }
   .nav-tab.active { background: var(--teal); color: var(--white); }
-  .view { display: none; padding: 32px 24px; max-width: 960px; margin: 0 auto; }
+  .view { display: none; padding: 32px 24px; max-width: 980px; margin: 0 auto; }
   .view.active { display: block; }
   .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
   .card-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); flex-shrink:0; }
   .field { margin-bottom: 16px; }
   .field label { display: block; font-size: 13px; font-weight: 600; color: var(--gray); margin-bottom: 6px; }
-  .field input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border 0.15s; }
-  .field input:focus { border-color: var(--teal); }
+  .field input, .field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; outline: none; transition: border 0.15s; background: white; }
+  .field input:focus, .field select:focus { border-color: var(--teal); }
   .field input.error { border-color: var(--red); }
   .field input.success { border-color: var(--green); }
   .field-hint { font-size: 12px; margin-top: 5px; }
   .field-hint.error { color: var(--red); }
   .field-hint.success { color: var(--green); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media(max-width:600px){ .field-row { grid-template-columns: 1fr; } }
   .btn { padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
   .btn-primary { background: var(--teal); color: var(--white); }
   .btn-primary:hover { background: #0e7490; }
@@ -42,15 +44,30 @@
   .btn-success:hover { background: #15803d; }
   .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--navy); }
   .btn-danger { background: var(--red); color: var(--white); }
+  .btn-purple { background: var(--purple); color: var(--white); }
+  .btn-purple:hover { background: #6d28d9; }
+  .btn-amber { background: var(--amber); color: var(--white); }
   .btn-sm { padding: 6px 14px; font-size: 13px; }
   .btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .search-bar { display: flex; gap: 10px; }
   .search-bar input { flex: 1; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 15px; outline: none; }
   .search-bar input:focus { border-color: var(--teal); }
   .consumer-card { background: var(--teal-pale); border: 1.5px solid var(--teal-light); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-  .consumer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 12px; margin-bottom: 16px; }
+  .consumer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 16px; }
   .cf-label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
   .cf-value { font-size: 14px; font-weight: 600; color: var(--navy); }
+  /* Phone number cards */
+  .phone-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; margin-bottom: 16px; }
+  .phone-card { border-radius: 10px; padding: 14px 16px; border: 1.5px solid; }
+  .phone-card.rms { background: #eff6ff; border-color: #93c5fd; }
+  .phone-card.otp { background: var(--green-pale); border-color: #86efac; }
+  .phone-card.ticket { background: var(--purple-pale); border-color: #c4b5fd; }
+  .phone-card .pc-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+  .phone-card.rms .pc-label { color: #1d4ed8; }
+  .phone-card.otp .pc-label { color: var(--green); }
+  .phone-card.ticket .pc-label { color: var(--purple); }
+  .phone-card .pc-num { font-size: 16px; font-weight: 700; color: var(--navy); }
+  .phone-card .pc-num.empty { color: #94a3b8; font-weight: 400; font-size: 13px; font-style: italic; }
   .alert { padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; margin-bottom: 16px; display: none; }
   .alert.success { background: var(--green-pale); color: var(--green); border: 1px solid #86efac; }
   .alert.error { background: var(--red-pale); color: var(--red); border: 1px solid #fca5a5; }
@@ -64,19 +81,23 @@
   .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th { background: var(--navy); color: var(--white); padding: 10px 14px; text-align: left; font-weight: 600; white-space: nowrap; }
-  td { padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: var(--light); }
-  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap: 12px; margin-bottom: 24px; }
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 12px; margin-bottom: 24px; }
   .stat { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
   .stat-label { font-size: 12px; color: var(--gray); margin-bottom: 4px; }
   .stat-value { font-size: 26px; font-weight: 700; }
   .stat-value.teal { color: var(--teal); }
   .stat-value.green { color: var(--green); }
   .stat-value.amber { color: var(--amber); }
+  .stat-value.purple { color: var(--purple); }
   .badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
   .badge-green { background: var(--green-pale); color: var(--green); }
   .badge-red { background: var(--red-pale); color: var(--red); }
+  .badge-blue { background: #eff6ff; color: #1d4ed8; }
+  .badge-purple { background: var(--purple-pale); color: var(--purple); }
+  .badge-amber { background: #fef3c7; color: #92400e; }
   .steps { display: flex; align-items: center; gap: 0; margin-bottom: 28px; }
   .step { display: flex; align-items: center; gap: 8px; }
   .step-num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; background: var(--border); color: var(--gray); }
@@ -91,6 +112,13 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
   #dl-link { display: none; }
+  .section-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--gray); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .info-box { background: #fef9ec; border: 1px solid #fde68a; border-radius: 8px; padding: 12px 14px; font-size: 13px; color: #92400e; margin-bottom: 16px; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 0; }
+  .tab-btn { padding: 8px 18px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--gray); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; border-radius: 6px 6px 0 0; }
+  .tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); background: var(--teal-pale); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
 </style>
 </head>
 <body>
@@ -115,6 +143,7 @@
     <div class="step"><div class="step-num" id="s3">3</div><div class="step-label" id="sl3">Submit</div></div>
   </div>
 
+  <!-- STEP 1: Search -->
   <div id="step1">
     <div class="card">
       <div class="card-title"><span class="dot"></span>Search Consumer</div>
@@ -126,6 +155,7 @@
     </div>
   </div>
 
+  <!-- STEP 2: Verify & Fill -->
   <div id="step2" style="display:none;">
     <div class="consumer-card">
       <div class="card-title" style="margin-bottom:12px;"><span class="dot"></span>Consumer Details</div>
@@ -133,34 +163,75 @@
         <div><div class="cf-label">Consumer No.</div><div class="cf-value" id="d-consumer"></div></div>
         <div><div class="cf-label">Name</div><div class="cf-value" id="d-name"></div></div>
         <div><div class="cf-label">Meter No.</div><div class="cf-value" id="d-meter"></div></div>
-        <div><div class="cf-label">Current Phone</div><div class="cf-value" id="d-phone"></div></div>
         <div><div class="cf-label">Status</div><div class="cf-value" id="d-status"></div></div>
+      </div>
+
+      <!-- Phone Numbers Display -->
+      <div class="section-label">Registered Phone Numbers</div>
+      <div class="phone-cards">
+        <div class="phone-card rms">
+          <div class="pc-label">📋 RMS Number</div>
+          <div class="pc-num" id="d-rms">—</div>
+        </div>
+        <div class="phone-card otp">
+          <div class="pc-label">✅ OTP Verified</div>
+          <div class="pc-num" id="d-otp">—</div>
+        </div>
+        <div class="phone-card ticket">
+          <div class="pc-label">🎫 Ticket Number</div>
+          <div class="pc-num" id="d-ticket">—</div>
+        </div>
       </div>
       <button class="btn btn-outline btn-sm" onclick="resetSearch()">← Search Again</button>
     </div>
+
     <div class="card">
-      <div class="card-title"><span class="dot"></span>Enter New Mobile Number</div>
+      <div class="card-title"><span class="dot"></span>Submit Change Request</div>
+
+      <div class="info-box">⚠️ Please fill your name and select which number type you are updating. All changes are logged with your name and timestamp.</div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Your Name (Operator) <span style="color:var(--red)">*</span></label>
+          <input type="text" id="operator-name" placeholder="Enter your full name" oninput="checkFormReady()">
+          <div class="field-hint" id="operator-hint"></div>
+        </div>
+        <div class="field">
+          <label>Number Type to Update <span style="color:var(--red)">*</span></label>
+          <select id="number-type" onchange="onNumberTypeChange()">
+            <option value="">— Select type —</option>
+            <option value="rms">RMS Number</option>
+            <option value="otp_verified">OTP Verified Number</option>
+            <option value="ticket">Number through Ticket Raise</option>
+          </select>
+        </div>
+      </div>
+
       <div class="field">
-        <label>New Mobile Number</label>
+        <label>New Mobile Number <span style="color:var(--red)">*</span></label>
         <input type="text" id="new-phone" maxlength="10" placeholder="Enter 10-digit mobile number" oninput="validatePhone(this.value)" onkeydown="if(event.key==='Enter')submitRequest()">
         <div class="field-hint" id="phone-hint"></div>
       </div>
+
       <div class="alert" id="submit-alert"></div>
       <button class="btn btn-success" id="submit-btn" onclick="submitRequest()" disabled>Submit Request</button>
     </div>
   </div>
 
+  <!-- STEP 3: Confirmation -->
   <div id="step3" style="display:none;">
     <div class="card" style="text-align:center; padding:40px;">
       <div style="font-size:48px; margin-bottom:16px;">✅</div>
       <div style="font-size:20px; font-weight:800; margin-bottom:8px; color:var(--green);">Request Submitted!</div>
-      <p style="font-size:14px; color:var(--gray); margin-bottom:24px;">Your mobile update request has been saved successfully.</p>
-      <div style="background:var(--light); border-radius:10px; padding:16px; display:inline-block; text-align:left; margin-bottom:24px; min-width:280px;">
-        <div style="font-size:12px; color:var(--gray); margin-bottom:4px;">Account Number</div>
-        <div style="font-size:15px; font-weight:700;" id="conf-account"></div>
-        <hr style="margin:12px 0;">
-        <div style="font-size:12px; color:var(--gray); margin-bottom:4px;">New Mobile Number</div>
-        <div style="font-size:15px; font-weight:700; color:var(--teal);" id="conf-phone"></div>
+      <p style="font-size:14px; color:var(--gray); margin-bottom:24px;">Mobile update request saved and logged successfully.</p>
+      <div style="background:var(--light); border-radius:10px; padding:16px; display:inline-block; text-align:left; margin-bottom:24px; min-width:300px;">
+        <div style="display:grid; gap:10px;">
+          <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Account Number</div><div style="font-size:15px;font-weight:700;" id="conf-account"></div></div>
+          <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">New Mobile Number</div><div style="font-size:15px;font-weight:700;color:var(--teal);" id="conf-phone"></div></div>
+          <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Number Type</div><div style="font-size:14px;font-weight:600;" id="conf-type"></div></div>
+          <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Changed By</div><div style="font-size:14px;font-weight:600;" id="conf-operator"></div></div>
+          <div><div style="font-size:11px;color:var(--gray);margin-bottom:2px;">Timestamp</div><div style="font-size:13px;color:var(--gray);" id="conf-time"></div></div>
+        </div>
       </div>
       <br>
       <button class="btn btn-primary" onclick="newRequest()">Submit Another Request</button>
@@ -171,15 +242,19 @@
 <!-- ADMIN VIEW -->
 <div class="view" id="view-admin">
   <div class="page-title">Admin Dashboard</div>
-  <p class="page-sub">Manage master data, download change requests, and process updates.</p>
+  <p class="page-sub">Manage master data, review change requests, and download audit logs.</p>
+
   <div class="stats-grid">
     <div class="stat"><div class="stat-label">Total Consumers</div><div class="stat-value teal" id="a-total">—</div></div>
     <div class="stat"><div class="stat-label">Pending Requests</div><div class="stat-value amber" id="a-pending">—</div></div>
     <div class="stat"><div class="stat-label">Processed</div><div class="stat-value green" id="a-processed">—</div></div>
+    <div class="stat"><div class="stat-label">Total Changes Logged</div><div class="stat-value purple" id="a-logged">—</div></div>
   </div>
 
+  <!-- Upload Master -->
   <div class="card">
     <div class="card-title"><span class="dot"></span>1. Upload Master CSV</div>
+    <div class="info-box">📌 CSV should include columns: <strong>consumer_no, first_name, last_name, phone, meter_no, status</strong> and optionally <strong>rms_number, otp_verified_number, ticket_number</strong></div>
     <div class="upload-box" onclick="document.getElementById('master-input').click()">
       <div class="ub-icon">📂</div>
       <p>Click to upload Master CSV</p>
@@ -189,25 +264,50 @@
     <div class="alert" id="master-alert"></div>
   </div>
 
+  <!-- Tabs for Pending & Audit -->
   <div class="card">
-    <div class="card-title"><span class="dot"></span>2. Pending Change Requests</div>
-    <div id="no-requests" style="font-size:14px; color:var(--gray); padding:12px 0;">Loading...</div>
-    <div id="requests-table-wrap" style="display:none;">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Account No.</th><th>Name</th><th>Current Phone</th><th>New Phone</th><th>Requested At</th></tr></thead>
-          <tbody id="requests-tbody"></tbody>
-        </table>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('pending', this)">📋 Pending Requests</button>
+      <button class="tab-btn" onclick="switchTab('audit', this)">🕐 Audit Log (All Changes)</button>
+    </div>
+
+    <!-- Pending Tab -->
+    <div class="tab-content active" id="tab-pending">
+      <div id="no-requests" style="font-size:14px; color:var(--gray); padding:12px 0;">Loading...</div>
+      <div id="requests-table-wrap" style="display:none;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Account No.</th><th>Name</th><th>Current Phone</th><th>New Phone</th><th>Number Type</th><th>Changed By</th><th>Requested At</th></tr></thead>
+            <tbody id="requests-tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="downloadRequests()">⬇ Download Pending CSV</button>
+          <button class="btn btn-danger btn-sm" onclick="clearRequests()">🗑 Clear All Pending</button>
+        </div>
       </div>
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="downloadRequests()">⬇ Download CSV</button>
-        <button class="btn btn-danger btn-sm" onclick="clearRequests()">🗑 Clear All</button>
+    </div>
+
+    <!-- Audit Log Tab -->
+    <div class="tab-content" id="tab-audit">
+      <div id="no-audit" style="font-size:14px; color:var(--gray); padding:12px 0;">Loading audit log...</div>
+      <div id="audit-table-wrap" style="display:none;">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Account No.</th><th>Consumer Name</th><th>Changed By</th><th>Number Type</th><th>Old Number</th><th>New Number</th><th>Changed At</th></tr></thead>
+            <tbody id="audit-tbody"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:14px;">
+          <button class="btn btn-purple" onclick="downloadAuditLog()">⬇ Download Full Audit Log</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- Upload Processed -->
   <div class="card">
-    <div class="card-title"><span class="dot"></span>3. Upload Processed File</div>
+    <div class="card-title"><span class="dot"></span>2. Upload Processed File</div>
     <p style="font-size:13px; color:var(--gray); margin-bottom:16px;">Upload the processed CSV — matching accounts will be marked done and removed from pending.</p>
     <div class="upload-box" onclick="document.getElementById('processed-input').click()">
       <div class="ub-icon">✅</div>
@@ -222,13 +322,20 @@
 <a id="dl-link"></a>
 
 <script>
-// ─── SUPABASE INIT ────────────────────────────────────────────────────────────
+// ─── SUPABASE ─────────────────────────────────────────────────────────────────
 const SUPABASE_URL = 'https://dxjbhhgqgshucgfbnmyu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR4amJoaGdxZ3NodWNnZmJubXl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE4ODc2MTUsImV4cCI6MjA5NzQ2MzYxNX0.OjBxeuOofZbN-hEWmMdtord8VjvwxpvYcmVZi1ZmZJo';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentConsumer = null;
+let phoneValid = false;
+
+const TYPE_LABELS = {
+  rms: 'RMS Number',
+  otp_verified: 'OTP Verified Number',
+  ticket: 'Number through Ticket Raise'
+};
 
 // ─── VIEWS ────────────────────────────────────────────────────────────────────
 async function showView(v, event) {
@@ -243,6 +350,14 @@ async function showView(v, event) {
   if (event) event.target.classList.add('active');
 }
 
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'audit') loadAuditLog();
+}
+
 // ─── UPLOAD MASTER CSV ────────────────────────────────────────────────────────
 async function uploadMaster(file) {
   if (!file) return;
@@ -252,7 +367,6 @@ async function uploadMaster(file) {
   const delim = lines[0].includes('\t') ? '\t' : ',';
   const rawHeaders = splitLine(lines[0], delim).map(h => h.trim().toLowerCase().replace(/ /g,'_').replace(/[^a-z0-9_]/g,''));
 
-  // Map any CSV column variation → exact Supabase column name
   const colMap = {
     'consumer_no':'consumer_no','consumerid':'consumer_no','consumer_id':'consumer_no',
     'status':'status',
@@ -263,22 +377,23 @@ async function uploadMaster(file) {
     'meter_no':'meter_no','meterno':'meter_no','meter_number':'meter_no',
     'meter_type':'meter_type','metertype':'meter_type',
     'uom':'uom',
-    'sanction_load':'sanction_load','sanctionload':'sanction_load','sanction_l':'sanction_load',
-    'customer_meter_phase':'customer_meter_phase','customer_meter_pha':'customer_meter_phase',
-    'meter_bill_type':'meter_bill_type','meter_bill':'meter_bill_type','meter_billt':'meter_bill_type',
-    'meter_status':'meter_status','meterstatus':'meter_status','meter_sta':'meter_status',
+    'sanction_load':'sanction_load','sanctionload':'sanction_load',
+    'customer_meter_phase':'customer_meter_phase',
+    'meter_bill_type':'meter_bill_type',
+    'meter_status':'meter_status',
     'lat':'lat','latitude':'lat',
     'lng':'lng','longitude':'lng',
-    'app_status':'app_status','appstatus':'app_status','app_statuses':'app_status','app_statu':'app_status',
-    'sanction_load2':'sanction_load','sanction_l2':'sanction_load',
-    'is_tod':'is_tod','istod':'is_tod',
-    'svc_addr_line1':'svc_addr_line1','svcaddrline1':'svc_addr_line1','svc_addr':'svc_addr_line1','address':'svc_addr_line1'
+    'app_status':'app_status',
+    'is_tod':'is_tod',
+    'svc_addr_line1':'svc_addr_line1','address':'svc_addr_line1',
+    // NEW phone columns
+    'rms_number':'rms_number','rms':'rms_number',
+    'otp_verified_number':'otp_verified_number','otp_verified':'otp_verified_number','otp':'otp_verified_number',
+    'ticket_number':'ticket_number','ticket':'ticket_number','number_through_ticket':'ticket_number'
   };
 
   const headers = rawHeaders.map(h => colMap[h] || h);
-
-  // Only keep columns that exist in our table
-  const validCols = new Set(['consumer_no','status','acc_type','first_name','last_name','phone','meter_no','meter_type','uom','sanction_load','customer_meter_phase','meter_bill_type','meter_status','lat','lng','app_status','is_tod','svc_addr_line1']);
+  const validCols = new Set(['consumer_no','status','acc_type','first_name','last_name','phone','meter_no','meter_type','uom','sanction_load','customer_meter_phase','meter_bill_type','meter_status','lat','lng','app_status','is_tod','svc_addr_line1','rms_number','otp_verified_number','ticket_number']);
 
   const rows = [];
   for (let i = 1; i < lines.length; i++) {
@@ -291,17 +406,13 @@ async function uploadMaster(file) {
     rows.push(row);
   }
 
-  // Delete existing master data
   await db.from('master_data').delete().neq('id', 0);
-
-  // Insert in batches of 500
   const batchSize = 500;
   let inserted = 0;
   for (let i = 0; i < rows.length; i += batchSize) {
-    const batch = rows.slice(i, i + batchSize);
-    const { error } = await db.from('master_data').insert(batch);
+    const { error } = await db.from('master_data').insert(rows.slice(i, i + batchSize));
     if (error) { showAlert('master-alert', '❌ Error: ' + error.message, 'error'); return; }
-    inserted += batch.length;
+    inserted += rows.slice(i, i + batchSize).length;
   }
   showAlert('master-alert', `✅ ${inserted} consumer records uploaded successfully!`, 'success');
   await refreshAdmin();
@@ -325,7 +436,7 @@ async function searchConsumer() {
   btn.disabled = false;
 
   if (error) { showAlert('search-alert', 'Search error: ' + error.message, 'error'); return; }
-  if (!data || data.length === 0) { showAlert('search-alert', '❌ No consumer found. Please check the number and try again.', 'error'); return; }
+  if (!data || data.length === 0) { showAlert('search-alert', '❌ No consumer found. Check the number and try again.', 'error'); return; }
 
   currentConsumer = data[0];
   hideAlert('search-alert');
@@ -334,71 +445,141 @@ async function searchConsumer() {
   document.getElementById('d-consumer').textContent = currentConsumer.consumer_no || 'N/A';
   document.getElementById('d-name').textContent     = name;
   document.getElementById('d-meter').textContent    = currentConsumer.meter_no || 'N/A';
-  document.getElementById('d-phone').textContent    = currentConsumer.phone || 'N/A';
   document.getElementById('d-status').innerHTML     = `<span class="badge ${currentConsumer.status === 'Active' ? 'badge-green' : 'badge-red'}">${currentConsumer.status || 'N/A'}</span>`;
+
+  // Show phone numbers
+  setPhoneCard('d-rms',    currentConsumer.rms_number);
+  setPhoneCard('d-otp',    currentConsumer.otp_verified_number);
+  setPhoneCard('d-ticket', currentConsumer.ticket_number);
 
   setStep(2);
   document.getElementById('step1').style.display = 'none';
   document.getElementById('step2').style.display = 'block';
+
+  // Reset form
+  document.getElementById('operator-name').value = '';
+  document.getElementById('number-type').value = '';
   document.getElementById('new-phone').value = '';
   document.getElementById('phone-hint').textContent = '';
+  document.getElementById('new-phone').className = '';
   document.getElementById('submit-btn').disabled = true;
+  phoneValid = false;
 }
 
-// ─── PHONE VALIDATION ─────────────────────────────────────────────────────────
+function setPhoneCard(id, val) {
+  const el = document.getElementById(id);
+  if (val && val.trim()) {
+    el.textContent = val.trim();
+    el.className = 'pc-num';
+  } else {
+    el.textContent = 'Not available';
+    el.className = 'pc-num empty';
+  }
+}
+
+// ─── FORM VALIDATION ─────────────────────────────────────────────────────────
+function onNumberTypeChange() { checkFormReady(); }
+
 function validatePhone(val) {
   const input = document.getElementById('new-phone');
   const hint  = document.getElementById('phone-hint');
-  const btn   = document.getElementById('submit-btn');
   val = val.trim();
-  if (val === '') { input.className=''; hint.textContent=''; hint.className='field-hint'; btn.disabled=true; return; }
-  if (!/^\d+$/.test(val)) { setPhoneError(input,hint,btn,'❌ Only digits allowed — no spaces, dashes or letters.'); }
-  else if (val[0]==='0') { setPhoneError(input,hint,btn,'❌ Mobile numbers cannot start with 0.'); }
-  else if (!['6','7','8','9'].includes(val[0])) { setPhoneError(input,hint,btn,'❌ Indian mobile numbers must start with 6, 7, 8 or 9.'); }
-  else if (val.length < 10) { setPhoneError(input,hint,btn,`❌ Too short — ${val.length}/10 digits entered.`); }
-  else if (val.length > 10) { setPhoneError(input,hint,btn,'❌ Too long — must be exactly 10 digits.'); }
-  else { input.className='success'; hint.className='field-hint success'; hint.textContent='✅ Valid mobile number.'; btn.disabled=false; }
+  phoneValid = false;
+  if (val === '') { input.className=''; hint.textContent=''; hint.className='field-hint'; }
+  else if (!/^\d+$/.test(val)) { setPhoneError(input, hint, '❌ Only digits allowed.'); }
+  else if (!['6','7','8','9'].includes(val[0])) { setPhoneError(input, hint, '❌ Must start with 6, 7, 8 or 9.'); }
+  else if (val.length < 10) { setPhoneError(input, hint, `❌ Too short — ${val.length}/10 digits.`); }
+  else if (val.length > 10) { setPhoneError(input, hint, '❌ Too long — must be exactly 10 digits.'); }
+  else {
+    input.className = 'success';
+    hint.className = 'field-hint success';
+    hint.textContent = '✅ Valid mobile number.';
+    phoneValid = true;
+  }
+  checkFormReady();
 }
 
-function setPhoneError(input,hint,btn,msg) {
-  input.className='error'; hint.className='field-hint error'; hint.textContent=msg; btn.disabled=true;
+function setPhoneError(input, hint, msg) {
+  input.className = 'error';
+  hint.className = 'field-hint error';
+  hint.textContent = msg;
 }
 
-// ─── SUBMIT REQUEST ───────────────────────────────────────────────────────────
+function checkFormReady() {
+  const operatorName = document.getElementById('operator-name').value.trim();
+  const numberType   = document.getElementById('number-type').value;
+  const hint = document.getElementById('operator-hint');
+  if (operatorName.length < 2 && operatorName.length > 0) {
+    hint.textContent = '❌ Name too short.'; hint.className = 'field-hint error';
+  } else {
+    hint.textContent = ''; hint.className = 'field-hint';
+  }
+  document.getElementById('submit-btn').disabled = !(operatorName.length >= 2 && numberType && phoneValid);
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────────────────
 async function submitRequest() {
-  const newPhone = document.getElementById('new-phone').value.trim();
-  if (!currentConsumer || !newPhone || document.getElementById('submit-btn').disabled) return;
+  const newPhone     = document.getElementById('new-phone').value.trim();
+  const operatorName = document.getElementById('operator-name').value.trim();
+  const numberType   = document.getElementById('number-type').value;
+  if (!currentConsumer || !newPhone || !operatorName || !numberType) return;
+  if (document.getElementById('submit-btn').disabled) return;
 
   const btn = document.getElementById('submit-btn');
   btn.innerHTML = '<span class="spinner"></span>Submitting...';
   btn.disabled = true;
 
-  const name = ((currentConsumer.first_name||'') + ' ' + (currentConsumer.last_name||'')).trim();
+  const name      = ((currentConsumer.first_name||'') + ' ' + (currentConsumer.last_name||'')).trim();
   const accountNo = currentConsumer.consumer_no || '';
 
-  // Check if request already exists — update it
-  const { data: existing } = await db.from('change_requests').select('id').eq('account_no', accountNo).eq('status','pending').limit(1);
+  // Determine old number based on type
+  const oldNumber = {
+    rms: currentConsumer.rms_number,
+    otp_verified: currentConsumer.otp_verified_number,
+    ticket: currentConsumer.ticket_number
+  }[numberType] || currentConsumer.phone || '';
 
-  let error;
+  const now = new Date().toISOString();
+
+  // 1. Save to change_requests (pending)
+  const { data: existing } = await db.from('change_requests').select('id').eq('account_no', accountNo).eq('status','pending').limit(1);
+  let reqError;
   if (existing && existing.length > 0) {
-    ({ error } = await db.from('change_requests').update({ new_phone: newPhone, requested_at: new Date().toISOString() }).eq('id', existing[0].id));
+    ({ error: reqError } = await db.from('change_requests').update({
+      new_phone: newPhone, requested_at: now,
+      number_type: numberType, changed_by: operatorName
+    }).eq('id', existing[0].id));
   } else {
-    ({ error } = await db.from('change_requests').insert({
-      account_no: accountNo,
-      consumer_name: name,
-      current_phone: currentConsumer.phone || '',
-      new_phone: newPhone,
-      status: 'pending'
+    ({ error: reqError } = await db.from('change_requests').insert({
+      account_no: accountNo, consumer_name: name,
+      current_phone: oldNumber, new_phone: newPhone,
+      status: 'pending', number_type: numberType, changed_by: operatorName
     }));
   }
 
+  if (reqError) { showAlert('submit-alert', '❌ Error: ' + reqError.message, 'error'); btn.innerHTML='Submit Request'; btn.disabled=false; return; }
+
+  // 2. Save to audit log (phone_change_log)
+  const { error: logError } = await db.from('phone_change_log').insert({
+    account_no: accountNo,
+    consumer_name: name,
+    changed_by: operatorName,
+    old_number: oldNumber,
+    new_number: newPhone,
+    number_type: numberType,
+    changed_at: now
+  });
+
   btn.innerHTML = 'Submit Request';
-  btn.disabled = false;
+  if (logError) { showAlert('submit-alert', '⚠️ Request saved but audit log failed: ' + logError.message, 'error'); btn.disabled=false; return; }
 
-  if (error) { showAlert('submit-alert', '❌ Error: ' + error.message, 'error'); return; }
+  // Show confirmation
+  document.getElementById('conf-account').textContent  = accountNo;
+  document.getElementById('conf-phone').textContent    = newPhone;
+  document.getElementById('conf-type').textContent     = TYPE_LABELS[numberType] || numberType;
+  document.getElementById('conf-operator').textContent = operatorName;
+  document.getElementById('conf-time').textContent     = new Date(now).toLocaleString('en-IN');
 
-  document.getElementById('conf-account').textContent = accountNo;
-  document.getElementById('conf-phone').textContent   = newPhone;
   setStep(3);
   document.getElementById('step2').style.display = 'none';
   document.getElementById('step3').style.display = 'block';
@@ -413,7 +594,7 @@ function newRequest() {
 }
 
 function resetSearch() {
-  currentConsumer = null;
+  currentConsumer = null; phoneValid = false;
   document.getElementById('step2').style.display = 'none';
   document.getElementById('step1').style.display = 'block';
   document.getElementById('search-input').value = '';
@@ -423,43 +604,90 @@ function resetSearch() {
 
 // ─── ADMIN ────────────────────────────────────────────────────────────────────
 async function refreshAdmin() {
-  // Total consumers
-  const { count: total } = await db.from('master_data').select('*', { count: 'exact', head: true });
-  document.getElementById('a-total').textContent = (total || 0).toLocaleString();
-
-  // Pending requests
-  const { data: pending, count: pendingCount } = await db.from('change_requests').select('*', { count: 'exact' }).eq('status','pending').order('requested_at', { ascending: false });
-  document.getElementById('a-pending').textContent = pendingCount || 0;
-
-  // Processed count
+  const { count: total }     = await db.from('master_data').select('*', { count: 'exact', head: true });
+  const { count: pending }   = await db.from('change_requests').select('*', { count: 'exact', head: true }).eq('status','pending');
   const { count: processed } = await db.from('change_requests').select('*', { count: 'exact', head: true }).eq('status','processed');
-  document.getElementById('a-processed').textContent = (processed || 0).toLocaleString();
+  const { count: logged }    = await db.from('phone_change_log').select('*', { count: 'exact', head: true });
 
-  // Render table
-  if (!pending || pending.length === 0) {
+  document.getElementById('a-total').textContent     = (total || 0).toLocaleString();
+  document.getElementById('a-pending').textContent   = pending || 0;
+  document.getElementById('a-processed').textContent = (processed || 0).toLocaleString();
+  document.getElementById('a-logged').textContent    = (logged || 0).toLocaleString();
+
+  // Load pending requests
+  const { data: pendingData } = await db.from('change_requests').select('*').eq('status','pending').order('requested_at', { ascending: false });
+
+  if (!pendingData || pendingData.length === 0) {
     document.getElementById('no-requests').style.display = 'block';
     document.getElementById('no-requests').textContent = 'No pending requests.';
     document.getElementById('requests-table-wrap').style.display = 'none';
   } else {
     document.getElementById('no-requests').style.display = 'none';
     document.getElementById('requests-table-wrap').style.display = 'block';
-    document.getElementById('requests-tbody').innerHTML = pending.map((r,i) => `
+    document.getElementById('requests-tbody').innerHTML = pendingData.map((r, i) => `
       <tr>
         <td>${i+1}</td>
         <td><strong>${r.account_no}</strong></td>
-        <td>${r.consumer_name}</td>
-        <td>${r.current_phone}</td>
+        <td>${r.consumer_name || '—'}</td>
+        <td>${r.current_phone || '—'}</td>
         <td style="color:var(--teal);font-weight:600;">${r.new_phone}</td>
-        <td style="color:var(--gray);font-size:12px;">${new Date(r.requested_at).toLocaleString()}</td>
+        <td>${typeBadge(r.number_type)}</td>
+        <td style="font-weight:600;">${r.changed_by || '—'}</td>
+        <td style="color:var(--gray);font-size:12px;">${r.requested_at ? new Date(r.requested_at).toLocaleString('en-IN') : '—'}</td>
       </tr>`).join('');
   }
 }
 
+async function loadAuditLog() {
+  document.getElementById('no-audit').textContent = 'Loading...';
+  document.getElementById('no-audit').style.display = 'block';
+  document.getElementById('audit-table-wrap').style.display = 'none';
+
+  const { data, error } = await db.from('phone_change_log').select('*').order('changed_at', { ascending: false }).limit(500);
+
+  if (error || !data || data.length === 0) {
+    document.getElementById('no-audit').textContent = 'No audit records found.';
+    return;
+  }
+
+  document.getElementById('no-audit').style.display = 'none';
+  document.getElementById('audit-table-wrap').style.display = 'block';
+  document.getElementById('audit-tbody').innerHTML = data.map((r, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><strong>${r.account_no}</strong></td>
+      <td>${r.consumer_name || '—'}</td>
+      <td style="font-weight:600;color:var(--purple);">${r.changed_by || '—'}</td>
+      <td>${typeBadge(r.number_type)}</td>
+      <td style="color:var(--gray);">${r.old_number || '—'}</td>
+      <td style="color:var(--teal);font-weight:600;">${r.new_number}</td>
+      <td style="color:var(--gray);font-size:12px;">${r.changed_at ? new Date(r.changed_at).toLocaleString('en-IN') : '—'}</td>
+    </tr>`).join('');
+}
+
+function typeBadge(type) {
+  const map = {
+    rms: '<span class="badge badge-blue">RMS</span>',
+    otp_verified: '<span class="badge badge-green">OTP Verified</span>',
+    ticket: '<span class="badge badge-purple">Ticket</span>'
+  };
+  return map[type] || (type ? `<span class="badge">${type}</span>` : '—');
+}
+
 async function downloadRequests() {
-  const { data } = await db.from('change_requests').select('account_no,new_phone').eq('status','pending');
+  const { data } = await db.from('change_requests').select('*').eq('status','pending').order('requested_at', {ascending: false});
   if (!data || !data.length) return;
-  const csv = ['account_no,new_phone', ...data.map(r => `${r.account_no},${r.new_phone}`)].join('\n');
-  triggerDownload(csv, 'phone_change_requests.csv');
+  const headers = ['account_no','consumer_name','current_phone','new_phone','number_type','changed_by','requested_at'];
+  const csv = [headers.join(','), ...data.map(r => headers.map(h => `"${(r[h]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+  triggerDownload(csv, 'pending_requests.csv');
+}
+
+async function downloadAuditLog() {
+  const { data } = await db.from('phone_change_log').select('*').order('changed_at', {ascending: false});
+  if (!data || !data.length) return alert('No audit records to download.');
+  const headers = ['id','account_no','consumer_name','changed_by','number_type','old_number','new_number','changed_at'];
+  const csv = [headers.join(','), ...data.map(r => headers.map(h => `"${(r[h]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+  triggerDownload(csv, 'audit_log_all_changes.csv');
 }
 
 async function clearRequests() {
@@ -500,10 +728,7 @@ function setStep(n) {
     document.getElementById('sl'+i).className = 'step-label' + (i===n?' active':'');
   });
 }
-function showAlert(id, msg, type) {
-  const el = document.getElementById(id);
-  el.textContent=msg; el.className='alert '+type; el.style.display='block';
-}
+function showAlert(id, msg, type) { const el=document.getElementById(id); el.textContent=msg; el.className='alert '+type; el.style.display='block'; }
 function hideAlert(id) { document.getElementById(id).style.display='none'; }
 function triggerDownload(content, filename) {
   const blob = new Blob(['\uFEFF'+content], {type:'text/csv;charset=utf-8;'});
@@ -516,14 +741,16 @@ function splitLine(line, delim) {
   const result=[]; let cur=''; let inQ=false;
   for (let i=0; i<line.length; i++) {
     const c=line[i];
-    if (c==='"'){inQ=!inQ;}
-    else if (c===delim&&!inQ){result.push(cur);cur='';}
+    if(c==='"'){inQ=!inQ;}
+    else if(c===delim&&!inQ){result.push(cur);cur='';}
     else{cur+=c;}
   }
   result.push(cur);
   return result;
 }
 </script>
+
 </body>
 </html>
+
 
