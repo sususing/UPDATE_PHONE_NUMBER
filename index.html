@@ -209,22 +209,12 @@
         </div>
       </div>
 
-      <div class="field-row">
-        <div class="field">
-          <label>Your Name (Operator) <span style="color:var(--red)">*</span></label>
-          <input type="text" id="operator-name" placeholder="Enter your full name" oninput="checkFormReady()">
-          <div class="field-hint" id="operator-hint"></div>
-        </div>
-        <div class="field">
-          <label>Number Type <span style="color:var(--red)">*</span></label>
-          <select id="number-type" onchange="onNumberTypeChange()">
-            <option value="">— Select type —</option>
-            <option value="rms">RMS Number</option>
-            <option value="otp_verified">OTP Verified Number</option>
-            <option value="ticket">Number through Ticket Raise</option>
-          </select>
-        </div>
+      <div class="field">
+        <label>Your Name (Operator) <span style="color:var(--red)">*</span></label>
+        <input type="text" id="operator-name" placeholder="Enter your full name" oninput="checkFormReady()">
+        <div class="field-hint" id="operator-hint"></div>
       </div>
+      <input type="hidden" id="number-type" value="current">
 
       <div class="field">
         <label>New Mobile Number <span style="color:var(--red)">*</span></label>
@@ -483,7 +473,6 @@ async function searchConsumer() {
 
   // Reset form
   document.getElementById('operator-name').value = '';
-  document.getElementById('number-type').value = '';
   document.getElementById('new-phone').value = '';
   document.getElementById('phone-hint').textContent = '';
   document.getElementById('new-phone').className = '';
@@ -537,14 +526,13 @@ function setPhoneError(input, hint, msg) {
 
 function checkFormReady() {
   const operatorName = document.getElementById('operator-name').value.trim();
-  const numberType   = document.getElementById('number-type').value;
   const hint = document.getElementById('operator-hint');
   if (operatorName.length < 2 && operatorName.length > 0) {
     hint.textContent = '❌ Name too short.'; hint.className = 'field-hint error';
   } else {
     hint.textContent = ''; hint.className = 'field-hint';
   }
-  document.getElementById('submit-btn').disabled = !(operatorName.length >= 2 && numberType && phoneValid);
+  document.getElementById('submit-btn').disabled = !(operatorName.length >= 2 && phoneValid);
 }
 
 // ─── SUBMIT ───────────────────────────────────────────────────────────────────
